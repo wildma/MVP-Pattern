@@ -8,7 +8,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wildma.mvp.R;
+import com.wildma.mvp.dagger2.component.DaggerUserInfoActivityComponent;
+import com.wildma.mvp.dagger2.module.UserInfoActivityModule;
 import com.wildma.mvp.presenter.UserInfoPresenter;
+
+import javax.inject.Inject;
 
 /**
  * Author     wildma
@@ -17,9 +21,12 @@ import com.wildma.mvp.presenter.UserInfoPresenter;
  */
 public class UserInfoActivity extends AppCompatActivity implements UserInfoView {
 
-    private TextView          mTvName;
-    private ProgressBar       mPbLoading;
-    private UserInfoPresenter mUserInfoPresenter;
+    private TextView    mTvName;
+    private ProgressBar mPbLoading;
+    //    UserInfoPresenter mUserInfoPresenter;
+
+    @Inject //标注实例化对象
+    UserInfoPresenter mUserInfoPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +38,16 @@ public class UserInfoActivity extends AppCompatActivity implements UserInfoView 
         mPbLoading = (ProgressBar) findViewById(R.id.pb_loading);
 
         //init
-        mUserInfoPresenter = new UserInfoPresenter(this);
+        //使用new的方式实例化UserInfoPresenter
+        //        mUserInfoPresenter = new UserInfoPresenter(this);
+
+        //使用Dagger2的方式实例化UserInfoPresenter
+        //将Module与目标类联系起来
+        DaggerUserInfoActivityComponent
+                .builder()
+                .userInfoActivityModule(new UserInfoActivityModule(this))
+                .build()
+                .inject(this);
     }
 
     /**
